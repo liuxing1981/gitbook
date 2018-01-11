@@ -12,7 +12,7 @@ else
     set timeout 1;
     spawn git clone $GIT_URL $PROJECT
     expect \"(yes/no)?\" {send \"yes\n\"};
-    expect * {send exit\n};
+    expect *# {send exit\n};
     expect eof;"
    #init gitbook dir
    if [ ! -d "$GITBOOK_HOME" ];then
