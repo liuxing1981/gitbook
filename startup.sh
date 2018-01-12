@@ -28,17 +28,6 @@ if [ ! $GIT_URL ];then
 else
    git config --global user.email "gitbook@example.com"
    git config --global user.name "gitbook"
-   git config --global core.sshCommand "ssh -o StrictHostKeyChecking=no -F /dev/null"
-   rm -rf /root/.ssh/known_hosts
-   echo "======rm known_hosts=========="
-   
-   expect -c "
-    set timeout 1;
-    spawn ssh $GIT_HOST; 
-    expect \"(yes/no)?\" {send \"yes\n\"};
-    expect *# {send exit\n};
-    expect eof;" >/tmp/log
-    
    git clone -b $BRANCH $GIT_URL $PROJECT
    
    #branch not exist,need to create a new branch named gitbook

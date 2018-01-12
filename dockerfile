@@ -1,9 +1,11 @@
 FROM mhart/alpine-node:6
 
 #use aliyun and dns
-RUN sed -i s/dl-cdn\.alpinelinux\.org/mirrors.aliyun.com/g /etc/apk/repositories && echo "nameserver 114.114.114.114">/etc/resolv.conf
+RUN sed -i s/dl-cdn\.alpinelinux\.org/mirrors.aliyun.com/g /etc/apk/repositories
 
 RUN apk update && apk add --no-cache openssh-client git expect
+#use no StrictHostKeyChecking
+RUN sed -i '/StrictHostKey/ {s/#//;s/ask/no/}' /etc/ssh/ssh_config
 
 ENV PROJECT=/root/project
 ADD startup.sh /root/startup.sh
