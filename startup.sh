@@ -3,7 +3,7 @@ GIT_HOST=`echo $GIT_URL | awk -F: '{print $1}'`
 GITBOOK=gitbook
 BRANCH=gitbook
 
-gitbook_init() {
+create_readme() {
 cat >README.md <<-! 
 # README
 
@@ -11,7 +11,9 @@ This is a book powered by [GitBook](https://github.com/GitbookIO/gitbook).
 Try to edit markdown files by [Markdown Editor](https://jbt.github.io/markdown-editor/).
 Or create a gitbook by [Gitbook Editor](https://www.gitbook.com/editor).
 !
+}
 
+create_summary() {
 cat >SUMMARY.md <<-!
 # SUMMARY
 
@@ -38,7 +40,8 @@ else
         cd $PROJECT
         git checkout -b $BRANCH
         rm -rf *
-        gitbook_init
+        create_readme
+        create_summary
         echo "==========git commit=============================="
         git commit -am "init gitbook"
         #git pull origin $BRANCH --rebase
@@ -50,4 +53,12 @@ else
    echo "*/$INTERVAL * * * * cd $PROJECT && git pull origin $BRANCH --rebase" > /var/spool/cron/crontabs/root
    crond
 fi  
-cd $PROJECT && gitbook serve
+chmod -R 777 $PROJECT
+cd $PROJECT 
+if [ ! -e "README.md" ];then
+    create_readme
+fi
+if [ ! -e "SUMMARY.md" ];then
+    create_summary
+fi
+gitbook serve
