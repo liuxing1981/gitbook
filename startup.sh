@@ -1,7 +1,9 @@
 #!/bin/sh
 GIT_HOST=`echo $GIT_URL | awk -F: '{print $1}'`
 GITBOOK=gitbook
-BRANCH=gitbook
+if [ "$BRANCH" ];then
+    BRANCH=master
+fi
 
 create_readme() {
 cat >README.md <<-! 
@@ -25,9 +27,9 @@ cat >SUMMARY.md <<-!
 }
 
 
-if [ ! $GIT_URL ];then  
-   echo "\$GIT_URL IS NULL use local $PROJECT"  
-else
+if [ "$GIT_URL" ];then  
+   #echo "\$GIT_URL IS NULL use local $PROJECT"  
+#else
    git config --global user.email "gitbook@example.com"
    git config --global user.name "gitbook"
    git clone -b $BRANCH $GIT_URL $PROJECT
@@ -50,15 +52,31 @@ else
    echo "===============end=========================================="   
    #add a cronjob to get git changed files
    [ ! "$INTERVAL" ] && INTERVAL=5
-   echo "*/$INTERVAL * * * * cd $PROJECT && git pull origin $BRANCH --rebase" > /var/spool/cron/crontabs/root
+   echo "*/$INTERVAL * * * * cd $PROJECT && git stash && git pull origin $BRANCH --rebase" > /var/spool/cron/crontabs/root
    crond
+   domain=`echo $GIT_URL | awk -F@ '{print $2}' | awk -F: '{print $1}'`
+   user=`echo $GIT_URL | awk -F: '{print $2}' | awk -F/ '{print $1}'`
+   repo=`echo $GIT_URL | awk -F: '{print $2}' | awk -F/ '{print $2}'`
+#  https://github.com/liuxing1981/gitbook.git
+   schema=https
+   GIT_HUB=`echo "$schema://$domain/$user/$repo/blob/$BRANCH"`
 fi  
+
+if [ "$HTTPS_URL" ];then
+    git clone $HTTPS_URL $PROJECT
+fi 
+
 chmod -R 777 $PROJECT
 cd $PROJECT 
+[ -e book.json ] || mv /root/book.json .
 if [ ! -e "README.md" ];then
     create_readme
 fi
 if [ ! -e "SUMMARY.md" ];then
     create_summary
 fi
+if [ "$GIT_HUB" && -e book.json ];then
+   sed -i "s#GIT_HUB#$GIT_HUB#" book.json
+fi
 gitbook serve
+

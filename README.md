@@ -17,7 +17,7 @@ http://localhost:4000
 ##### 就可以访问
 
 
-#### 第二种 克隆一份代码到容器，并新建一个gitbook分支，这个分支中只有gitbook相关的文档，浏览器显示的是docker容器里git clone下来的gitbook分支的文件。这样每个人在本地修改gitbook的md文件提交后，容器里的定时任务会进行git pull，保证显示gitbook分支的是最新代码。
+#### 第二种 克隆一份代码到容器，并新建一个分支，由环境变量BRANCH设置，默认为master
 
 ```
 docker run -d -p 4000:4000 -e GIT_URL=git@git.eng.centling.com:testing \
@@ -26,11 +26,26 @@ docker run -d -p 4000:4000 -e GIT_URL=git@git.eng.centling.com:testing \
 	liuxing1981/gitbook
 ```
 
-* GIT_URL: 为git项目的地址,默认会新建分支gitbook
-* 注意：启动时需要用用户的公钥、私钥，请确保您的用户有项目的权限
+```
+#利用HTTPS_URL环境变量，只拉取代码进行展示
+docker run -d -p 4000:4000 -e HTTPS_URL=https://github.com/liuxing1981/gitbook.git \
+	liuxing1981/gitbook
+```
+
+```
+#建立一个gitbook分支，用于保存文档信息
+docker run -d -p 4000:4000 -e GIT_URL=git@git.eng.centling.com:testing -e BRANCH=gitbook \
+    -v /root/.ssh/id_rsa:/root/.ssh/id_rsa \
+    -v /root/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub \
+	liuxing1981/gitbook
+```
+* GIT_URL: git项目的地址
+* 注意：配置GIT_URL启动时需要同时制定用户的公钥、私钥，请确保您的用户有项目的权限
+* HTTPS_URL: git项目的https地址，用于只读的项目
+* BRANCH: 为文档的分支，如果要把文档和代码一起管理，只需要BRANCH=gitbook，建立一个gitbook分支。如果本身git项目就是一个文档，则无需指定。默认BRANCH=master
 
 ## 运行原理
 1. 克隆项目
-2. 检查项目中是否有gitbook分支，gitbook分支是存放所有markdown文件的，如果没有则会创建gitbook分支并初始化，然后git push刚建立的gitbook分支到远程git库
-3. 启动cronjob，每隔5分钟去git pull代码
+2. 检查项目中是否指定有gitbook分支，gitbook分支是存放所有markdown文件的，如果没有则会创建gitbook分支并初始化，然后git push刚建立的gitbook分支到远程git库。如果没有指定，则用master分支
+3. 启动cronjob，默认每隔5分钟去git pull代码，可以通过环境变量INTERVAL=3配置，默认为5分钟
 4. 启动gitbook服务，监听在4000端口
