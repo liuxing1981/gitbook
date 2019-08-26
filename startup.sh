@@ -31,7 +31,6 @@ if [ "$GIT_URL" ];then
    git config --global user.email "gitbook@example.com"
    git config --global user.name "gitbook"
    git clone $GIT_URL -b $BRANCH $PROJECT
-   
    #branch not exist,need to create a new branch named gitbook
    if [ $? != 0 ];then
         echo "========create branch=============="
@@ -50,7 +49,7 @@ if [ "$GIT_URL" ];then
    echo "===============end=========================================="   
    #add a cronjob to get git changed files
    INTERVAL=${INTERVAL:-3}
-   echo "*/$INTERVAL * * * * cd $PROJECT && git stash && git pull origin $BRANCH --rebase" > /var/spool/cron/crontabs/root
+   echo "*/$INTERVAL * * * * expect /root/git_pull.exp" > /var/spool/cron/crontabs/root
    crond
    domain=`echo $GIT_URL | awk -F@ '{print $2}' | awk -F: '{print $1}'`
    user=`echo $GIT_URL | awk -F: '{print $2}' | awk -F/ '{print $1}'`
@@ -62,6 +61,8 @@ if [ "$GIT_URL" ];then
 elif [ "$HTTPS_URL" ];then
     git clone $HTTPS_URL $PROJECT
 fi 
+
+cd $PROJECT
 
 chmod -R 777 $PROJECT
 cd $PROJECT 
@@ -76,5 +77,7 @@ if [[ "$GIT_HUB" && -e book.json ]];then
    sed -i "s#GIT_HUB#$GIT_HUB#" book.json
    cat book.json
 fi
+git add -A
+git commit -m "github"
 gitbook serve
 

@@ -27,9 +27,16 @@ docker run -d -p 4000:4000 -e GIT_URL=git@git.eng.centling.com:testing \
 ```
 
 ```
-#利用HTTPS_URL环境变量，只拉取代码进行展示
-docker run -d -p 4000:4000 -e HTTPS_URL=https://github.com/liuxing1981/gitbook.git \
-	liuxing1981/gitbook
+#利用https,需要设置github的用户名和密码
+GIT_URL=https://github.com/liuxing1981/your_project.git
+GIT_USER=user
+GIT_PASS=password
+docker run --name $NAME -d -p 4000:4000 \
+                        -e GIT_URL=$GIT_URL \
+                        -e GIT_USER=$GIT_USER \
+                        -e GIT_PASS=$GIT_PASS \
+                        -v /root/project \
+                        liuxing1981/gitbook
 ```
 
 ```
@@ -41,7 +48,7 @@ docker run -d -p 4000:4000 -e GIT_URL=git@git.eng.centling.com:testing -e BRANCH
 ```
 * GIT_URL: git项目的地址
 * 注意：配置GIT_URL启动时需要同时制定用户的公钥、私钥，请确保您的用户有项目的权限
-* HTTPS_URL: git项目的https地址，用于只读的项目
+* HTTPS: git项目的https地址，需要配置github的用户名和密码
 * BRANCH: 为文档的分支，如果要把文档和代码一起管理，只需要BRANCH=gitbook，建立一个gitbook分支。如果本身git项目就是一个文档，则无需指定。默认BRANCH=master
 
 ## 运行原理

@@ -1,0 +1,15 @@
+#########################################################################
+# File Name: git_pull.exp
+# Author: xliu074
+# mail: xing.1.liu@nokia-sbell.com
+# Created Time: 2019-08-26 17:44
+#########################################################################
+#!/usr/bin/expect
+cd $env(PROJECT)
+set cmd "git pull --rebase"
+eval spawn $cmd
+expect {
+        "https://github.com" { send "$env(GIT_USER)\r"; exp_continue}
+        "liuxing1981@github.com" { send "$env(GIT_PASS)\r" }
+}
+

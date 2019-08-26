@@ -1,8 +1,8 @@
 FROM mhart/alpine-node:6
 
 #use aliyun and dns
-RUN sed -i s/dl-cdn\.alpinelinux\.org/mirrors.aliyun.com/g /etc/apk/repositories && \
-apk update && apk add --no-cache openssh-client git curl
+#RUN sed -i s/dl-cdn\.alpinelinux\.org/mirrors.aliyun.com/g /etc/apk/repositories && \
+RUN apk update && apk add --no-cache openssh-client git curl expect
 #use no StrictHostKeyChecking
 RUN sed -i '/StrictHostKey/ {s/#//;s/ask/no/}' /etc/ssh/ssh_config
 
@@ -32,4 +32,5 @@ rm -rf /root/node_modules
 #VOLUME /root/project
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD curl -fs http://localhost:4000 || exit 1
 COPY startup.sh /root/startup.sh
+COPY git_pull.exp /root/git_pull.exp
 CMD [ "sh","/root/startup.sh" ]
