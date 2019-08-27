@@ -17,10 +17,10 @@ npm cache clear &&\
 rm -rf /tmp/* && \
 #install plugins
 echo -e "{\n\
-    \"plugins\": [\"-lunr\", \"-search\", \"search-plus\",\"toggle-chapters\",\"splitter\",\"ace\",\"edit-link\"],\n\
+    \"plugins\": [\"-lunr\", \"-search\", \"search-plus\",\"toggle-chapters\",\"splitter\",\"ace\",\"edit-link\",\"code\",\"alerts\",\"klipse\",\"emphasize\",\"back-to-top-button\"],\n\
     \"pluginsConfig\": {\n\
         \"edit-link\": {\n\
-            \"base\": \"GIT_HUB\",\n\
+            \"base\": \"LINK_URL\",\n\
             \"label\": \"Edit This Page\"\n\
          }\n\
      }\n\
@@ -32,5 +32,5 @@ rm -rf /root/node_modules
 #VOLUME /root/project
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD curl -fs http://localhost:4000 || exit 1
 COPY startup.sh /root/startup.sh
-COPY git_pull.exp /root/git_pull.exp
+COPY git.exp /root/git.exp
 CMD [ "sh","/root/startup.sh" ]

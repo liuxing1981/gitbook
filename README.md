@@ -4,10 +4,10 @@
 这些markdown文件可以是这个git工程的说明文档，客户需求等等。
 运行方式有两种：
 
-#### 第一种
+#### 第一种 访问本地gitbook
 
 ```
-docker run -d -p 4000:4000 -v yourPath:/root/project liuxing1981/gitbook
+docker run -d -p 4000:4000 -v your_gitbook_path:/root/project liuxing1981/gitbook
 ```
 ##### gitbook的默认用法，把本地文件系统的gitbook文件夹挂载到容器里，在浏览器中输入
 
@@ -28,13 +28,13 @@ docker run -d -p 4000:4000 -e GIT_URL=git@git.eng.centling.com:testing \
 
 ```
 #利用https,需要设置github的用户名和密码
-GIT_URL=https://github.com/liuxing1981/your_project.git
-GIT_USER=user
-GIT_PASS=password
+HTTPS_URL=https://github.com/liuxing1981/your_project.git
+HTTPS_USER=user
+HTTPS_PASS=password
 docker run --name $NAME -d -p 4000:4000 \
-                        -e GIT_URL=$GIT_URL \
-                        -e GIT_USER=$GIT_USER \
-                        -e GIT_PASS=$GIT_PASS \
+                        -e HTTPS_URL=$HTTPS_URL \
+                        -e HTTPS_USER=$HTTPS_USER \
+                        -e HTTPS_PASS=$HTTPS_PASS \
                         -v /root/project \
                         liuxing1981/gitbook
 ```
@@ -48,7 +48,7 @@ docker run -d -p 4000:4000 -e GIT_URL=git@git.eng.centling.com:testing -e BRANCH
 ```
 * GIT_URL: git项目的地址
 * 注意：配置GIT_URL启动时需要同时制定用户的公钥、私钥，请确保您的用户有项目的权限
-* HTTPS: git项目的https地址，需要配置github的用户名和密码
+* HTTPS: git项目的https地址，需要在环境变量配置github的用户名和密码
 * BRANCH: 为文档的分支，如果要把文档和代码一起管理，只需要BRANCH=gitbook，建立一个gitbook分支。如果本身git项目就是一个文档，则无需指定。默认BRANCH=master
 
 ## 运行原理

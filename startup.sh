@@ -24,12 +24,39 @@ cat >SUMMARY.md <<-!
 !
 }
 
+crontab() {
+   GIT_URL=$1
+   #add a cronjob to get git changed files
+   INTERVAL=${INTERVAL:-3}
+   echo "*/$INTERVAL * * * * expect /root/git.exp fetch" > /var/spool/cron/crontabs/root
+   crond
+}
 
-if [ "$GIT_URL" ];then  
+#https://github.com/liuxing1981/note.git
+#git@github.com:liuxing1981/note.git
+set_edit_link() {
+   if echo $1 | grep "^git" 2>/dev/null;then
+       domain=`echo $1 | awk -F@ '{print $2}' | awk -F: '{print $1}'`
+       user=`echo $1 | awk -F: '{print $2}' | awk -F/ '{print $1}'`
+       repo=`echo $1 | awk -F: '{print $2}' | awk -F/ '{print $2}'`
+       repo=`echo $repo | sed 's/\.git//'`
+       schema=https
+       LINK_URL="$schema://$domain/$user/$repo/edit/$BRANCH/"
+   elif echo $1 | grep "^http" 2>/dev/null;then
+	   LINK_URL=`echo $1 | sed s/\.git$//`"/edit/$BRANCH/"
+   fi
+   echo LINK_URL=$LINK_URL
+   sed -i "s#LINK_URL#$LINKE_URL#" book.json
+}
+
+#set_edit_link https://github.com/liuxing1981/note.git
+#set_edit_link git@github.com:liuxing1981/note.git
+#exit 0
+
+git config --global user.email "gitbook@example.com"
+git config --global user.name "gitbook"
+if [ "$GIT_URL" ];then 
    #echo "\$GIT_URL IS NULL use local $PROJECT"  
-#else
-   git config --global user.email "gitbook@example.com"
-   git config --global user.name "gitbook"
    git clone $GIT_URL -b $BRANCH $PROJECT
    #branch not exist,need to create a new branch named gitbook
    if [ $? != 0 ];then
@@ -45,39 +72,42 @@ if [ "$GIT_URL" ];then
         git commit -am "init gitbook"
         #git pull origin $BRANCH --rebase
         git push origin $BRANCH
+   echo "===============GIT_URL=========================================="   
+   set_edit_link $GIT_URL
    fi
-   echo "===============end=========================================="   
-   #add a cronjob to get git changed files
-   INTERVAL=${INTERVAL:-3}
-   echo "*/$INTERVAL * * * * expect /root/git_pull.exp" > /var/spool/cron/crontabs/root
-   crond
-   domain=`echo $GIT_URL | awk -F@ '{print $2}' | awk -F: '{print $1}'`
-   user=`echo $GIT_URL | awk -F: '{print $2}' | awk -F/ '{print $1}'`
-   repo=`echo $GIT_URL | awk -F: '{print $2}' | awk -F/ '{print $2}'`
-   repo=`echo $repo | sed 's/\.git//'`
-#  https://github.com/liuxing1981/gitbook.git
-   schema=https
-   GIT_HUB=`echo "$schema://$domain/$user/$repo/edit/$BRANCH/"`
 elif [ "$HTTPS_URL" ];then
+   echo "===============HTTPS__URL=========================================="   
     git clone $HTTPS_URL $PROJECT
+	set_edit_link $HTTPS_URL
 fi 
 
-cd $PROJECT
+crontab
 
 chmod -R 777 $PROJECT
-cd $PROJECT 
-[ -e book.json ] || mv /root/book.json .
-if [ ! -e "README.md" ];then
-    create_readme
-fi
-if [ ! -e "SUMMARY.md" ];then
-    create_summary
-fi
-if [[ "$GIT_HUB" && -e book.json ]];then
-   sed -i "s#GIT_HUB#$GIT_HUB#" book.json
-   cat book.json
-fi
-git add -A
-git commit -m "github"
+cd $PROJECT
+#git config core.fileMode false
+#if [ ! -e book.json ];then
+#    mv /root/book.json .
+#    git add book.json
+#	echo "add git book"
+#	commitFlag=True
+#fi
+#if [ ! -e "README.md" ];then
+#    create_readme
+#	git add README.md
+#	echo "add README.md"
+#	commitFlag=True
+#fi
+#if [ ! -e "SUMMARY.md" ];then
+#    create_summary
+#	git add SUMMARY.md
+#	echo "add SUMMARY.md"
+#	commitFlag=True
+#fi
+#if [ "$commitFlag" ];then
+#	echo "commitFlag= $commitFlag"
+#    git commit -m "add book.json"
+#	expect /root/git.exp push
+#fi
+cat book.json
 gitbook serve
-
