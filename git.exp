@@ -5,13 +5,13 @@
 # Created Time: 2019-08-26 17:44
 #########################################################################
 #!/usr/bin/expect
+set cmd "git pull --rebase"
 cd $env(PROJECT)
-set cmd "git "
-set arg [lindex $argv 0]
-append cmd $arg
+exec git stash
 eval spawn $cmd
 expect {
         "https://github.com" { send "$env(HTTPS_USER)\r";exp_continue}
         "@github.com" { send "$env(HTTPS_PASS)\r";exp_continue }
         { send "\r" }
 }
+
