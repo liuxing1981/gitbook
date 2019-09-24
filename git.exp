@@ -10,8 +10,8 @@ cd $env(PROJECT)
 exec git stash
 eval spawn $cmd
 expect {
-        "https://github.com" { send "$env(HTTPS_USER)\r";exp_continue}
-        "@github.com" { send "$env(HTTPS_PASS)\r";exp_continue }
+        "http" { send "$env(HTTPS_USER)\r";exp_continue}
+        "@" { send "$env(HTTPS_PASS)\r";exp_continue }
         { send "\r" }
 }
 

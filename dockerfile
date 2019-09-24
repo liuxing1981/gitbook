@@ -17,7 +17,10 @@ npm cache clear &&\
 rm -rf /tmp/* && \
 #install plugins
 echo -e "{\n\
-    \"plugins\": [\"-lunr\", \"-search\", \"search-plus\",\"toggle-chapters\",\"splitter\",\"ace\",\"edit-link\",\"code\",\"alerts\",\"klipse\",\"emphasize\",\"back-to-top-button\"],\n\
+    \"plugins\": [\"-lunr\", \"-search\", \"search-plus\", \
+	\"expandable-chapters-small\",\"splitter\",\"ace\",\"edit-link\", \ 
+	\"code\",\"pageview-count\",\"alerts\",\"klipse\",\"emphasize\",\"back-to-top-button\", \
+	\"flexible-alerts\"],\n\
     \"pluginsConfig\": {\n\
         \"edit-link\": {\n\
             \"base\": \"LINK_URL\",\n\

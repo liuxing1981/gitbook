@@ -46,7 +46,6 @@ set_edit_link() {
 	   LINK_URL=`echo $1 | sed s/\.git$//`"/edit/$BRANCH/"
    fi
    echo LINK_URL=$LINK_URL
-   sed -i "s#LINK_URL#$LINKE_URL#" book.json
 }
 
 #set_edit_link https://github.com/liuxing1981/note.git
