@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:6
+FROM mhart/alpine-node
 
 #use aliyun and dns
 #RUN sed -i s/dl-cdn\.alpinelinux\.org/mirrors.aliyun.com/g /etc/apk/repositories && \
@@ -13,7 +13,7 @@ ENV PROJECT=/root/project
 #install gitbook
 RUN npm install --global gitbook-cli && \
 gitbook fetch && \
-npm cache clear &&\
+npm cache verify &&\
 rm -rf /tmp/* && \
 #install plugins
 echo -e "{\n\
